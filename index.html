@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Apache 2 : Générateur de fichier VirtualHost</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/main.css" media="screen" />
+  </head>
+  <body>
+    <div id="main">
+      <h1>Générateur de fichier VirtualHost</h1>
+      <p>Grâce à ce générateur vous pouvez créer rapidement votre fichier <strong>VirtualHost</strong> pour <strong>Apache2</strong>.</p>
+      <form action="" method="post">
+        <fieldset id="contenaire">     
+          <fieldset id="vh-options">
+            <p>
+              <label for="server_ip">Adresse IP du serveur</label> <input type="text" name="server_ip" id="server_ip" />
+            </p>
+            <p>
+              <label for="server_port">Port du serveur</label> <input type="text" name="server_port" id="server_port" />
+            </p>
+            <p>
+              <label for="server_name">Nom du domaine <em>(example.com)</em> <span class="important">*</span> </label><input type="text" name="server_name" id="server_name" />
+            </p>
+            <p>
+              <label for="server_alias">Nom de l'Alias <em>(blog.example.com)</em></label> <input type="text" name="server_alias" id="server_alias" /><br />
+              <em>Laissez vide si vous souhaitez que tout les sous-domaines pointent vers ce VirtualHost.</em>
+            </p>
+            <p>
+              <label for="server_admin">Courriel de l'administrateur</label> <input type="text" name="server_admin" id="server_admin" />
+            </p>
+            <p>
+              <label for="document_root">Répertoire racine <span class="important">*</span></label> <input type="text" name="document_root" id="document_root" value="/var/www/" /><br />
+            </p>
+            <fieldset class="directory" id="directory_root">
+              <legend>Répertoire racine (/var/www/)</legend>
+              <p class="duplicate">
+                    <a href="#">Dupliquer</a>
+              </p>
+              <p>
+                <input type="checkbox" name="option_exec_cgi" id="option_exec_cgi" /> 
+                <label for="option_exec_cgi">Autoriser l'éxécution des scripts CGI</label><br />
+                <em>L'exécution des scripts CGI est autorisée sur le serveur (pour plus de sécurité, laissez l'option inactive).</em>
+              </p>
+              <p>
+                <input type="checkbox" name="option_followsymlinks" id="option_followsymlinks" checked="checked" /> 
+                <label for="option_followsymlinks">Autoriser le serveur à suivre les liens symboliques</label><br />
+                <em>Permet d'afficher de lister le contenu d'un répertoire. Nécessaire pour l'URL Rewriting</em>
+              </p>
+              <p>
+                <input type="checkbox" name="option_includes" id="option_includes" /> 
+                <label for="option_includes">Inclusion Server-Side permises</label><br />
+                <em>Les inclusions par Server-Side-Include sont permises (pour plus de sécurité, laissez l'option inactive).</em>
+              </p> 
+              <p>
+                <input type="checkbox" name="option_indexes" id="option_indexes" /> 
+                <label for="option_indexes">Indexation des fichiers</label><br />
+                <em>Permet d'afficher de lister le contenu d'un répertoire (pour plus de sécurité, laissez l'option inactive)</em>
+              </p>   
+              <p>
+                <input type="checkbox" name="option_multiviews" id="option_multiviews" checked="checked" /> 
+                <label for="option_multiviews">MultiViews</label><br />
+                <em>Nécessaire pour l'URL Rewriting.</em>
+              </p>
+              <p>
+                <input type="checkbox" name="option_allow_override" id="option_allow_override" checked="checked" /> 
+                <label for="option_allow_override">Permettre l'utilisation du fichier ".htaccess"</label>
+              </p>
+              
+              <fieldset>
+                <legend>Restriction d'accès par adresse IP ou domaine</legend>
+                <p>
+                  <label for="allow-deny">Ordre des restrictions</label>
+                  <select name="allow-deny" id="allow-deny">
+                    <option value="Allow,Deny">Allow,Deny</option>
+                    <option value="Deny,Allow" selected="selected">Deny,Allow</option>
+                  </select>
+                </p>
+                <fieldset class="restrict-ip">
+                  <legend>Autoriser :</legend>
+                  <p class="duplicate">
+                    <a href="#">Dupliquer</a>
+                  </p>
+                  <p>
+                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip" id="domaine_or_ip_1" />
+                  </p>
+                </fieldset>
+              </fieldset>      
+            </fieldset>
+            
+            <fieldset>
+              <legend>Logs des erreurs</legend>
+              <p>
+                <label for="file_error">Chemin vers le fichier d'erreurs : </label> <input type="text" name="file_error" id="file_error" /><br />
+                <em>Laissez vide si vous souhaitez utiliser celui par défaut.</em>
+              </p>
+              <p>
+                <label for="log_level">Niveau d'alerte des erreurs : </label>
+                <select name="log_level" id="log_level">
+                debug, info, notice, warn, error, crit,
+	    # alert, emerg.
+                  <option value="debug">debug</option>
+                  <option value="info">info</option>
+                  <option value="notice">notice</option>
+                  <option value="warn">warn</option>
+                  <option value="error">error</option>
+                  <option value="crit">crit</option>
+                  <option value="alert">alert</option>
+                  <option value="emerg">emerg</option>
+                </select>
+              </p>
+              <p>
+                <label for="file_custom_error">Chemin vers le fichier d'erreurs custom ? : </label> <input type="text" name="file_custom_error" id="file_custom_error" /><br />
+                <em>Laissez vide si vous souhaitez utiliser celui par défaut.</em>
+              </p>
+            </fieldset>
+            
+            <fieldset id="phpmyadmin">
+              <legend>Protection de phpMyadmin</legend>
+              <p>
+                <input type="checkbox" name="protect_phpmyadmin" id="protect_phpmyadmin" /> 
+                <label for="protect_phpmyadmin">Protéger phpMyadmin ?</label><br />
+                <em>(pour plus de sécurité, laissez l'option active)</em>
+              </p>
+              <fieldset>
+                <legend>Restriction d'accès par adresse IP ou domaine</legend>
+                <p>
+                  <label for="allow-deny">Ordre des restrictions</label>
+                  <select name="allow-deny">
+                    <option value="allow-deny">Allow, Deny</option>
+                    <option value="deny-allow" selected="selected">Deny, Allow</option>
+                  </select>
+                </p>
+                <fieldset class="restrict-ip">
+                  <legend>Autoriser :</legend>
+                  <p class="duplicate">
+                    <a href="#">Dupliquer</a>
+                  </p>
+                  <p>
+                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip_1" id="domaine_or_ip_1" />
+                  </p>
+                </fieldset>
+              </fieldset>
+            </fieldset>
+            
+            <fieldset>
+              <legend>Options avancées</legend>
+              <p>
+                <input type="checkbox" name="server_signature" id="server_signature" /> 
+                <label for="server_signature">Permettre au serveur d'envoyé la version d'Apache, la version de PHP et le système d'eploitation</label><br />
+                <em>(pour plus de sécurité, laissez l'option inactive)</em>
+              </p>
+            </fieldset>
+            </fieldset>
+            <fieldset id="vh-generate">
+              <legend>Votre VirtualHost généré</legend>
+              <p>
+                <pre></pre>
+              </p>
+            </fieldset>
+        </fieldset>      
+      </form>
+    </div>
+  </body>
+</html>
