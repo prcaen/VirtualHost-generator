@@ -86,6 +86,7 @@ function duplicate()
   });
   return false;
 }
+
 function outputText()
 {
   var output;
@@ -215,6 +216,7 @@ function returnIfEmpty (inputVal, textIfEmpty)
   else
     return inputVal;
 }
+
 function validateInput (input, textIfEmpty, type)
 {
   var reg;
@@ -233,6 +235,7 @@ function validateInput (input, textIfEmpty, type)
 	    else
 	      return textIfEmpty
 }
+
 function isCheckedOption (input)
 {
   if (input.attr('checked') == 'checked')
@@ -240,9 +243,3 @@ function isCheckedOption (input)
   else
     return '-';
 }
-
-/*
-* TODO
-* - regex sur https changer le port en 443
-* - Ajouter ou non le backslash à la fin du documentRoot
-*/
