@@ -349,4 +349,8 @@ function isCheckedOption (input)
     return '+';
   else
     return '-';
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/master
