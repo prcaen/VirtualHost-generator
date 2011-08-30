@@ -350,9 +350,3 @@ function isCheckedOption (input)
   else
     return '-';
 }
-
-/*
-* TODO
-* - regex sur https changer le port en 443
-* - Ajouter ou non le backslash à la fin du documentRoot
-*/
