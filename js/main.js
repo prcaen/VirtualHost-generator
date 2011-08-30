@@ -5,7 +5,6 @@ var valid = false;
 $(document).ready(function(){
   outputText();
   
-  
   // Link to duplicate
   $('.directory p.duplicate a').click(duplicate);
   $('#phpmyadmin p.duplicate a').click(duplicate);
@@ -26,10 +25,12 @@ function duplicate()
   // Scroll
   var scrollElement = $("html");
   var scrollValue = scrollElement.scrollTop();
-  if (scrollElement.scrollTop(scrollValue + 1).scrollTop() == scrollValue) {
+  if (scrollElement.scrollTop(scrollValue + 1).scrollTop() == scrollValue)
+  {
     scrollElement = $("body");
   }
-  else {
+  else 
+  {
     scrollElement.scrollTop(scrollValue);
   }
   
@@ -86,9 +87,12 @@ function duplicate()
   });
   return false;
 }
+
 function outputText()
 {
   var output;
+  var outputData = new Array();
+  
   var server_ip     = $('#server_ip');
   var server_port   = $('#server_port');
   var server_name   = $('#server_name');
@@ -102,8 +106,7 @@ function outputText()
   var dir_root_option_indexes         = $('#directory_root #option_indexes');
   var dir_root_option_multiviews      = $('#directory_root #option_multiviews');
   var dir_root_option_allow_override  = $('#directory_root #option_allow_override');
-  
-  var dir_root_allow_deny      = $('#directory_root #allow-deny');
+  var dir_root_allow_deny             = $('#directory_root #allow-deny');
   
   var serverIp     = '*';
   var serverPort   = 80;
@@ -120,12 +123,14 @@ function outputText()
   var dirRootOptionAllowOverride    = 'All';
   var dirRootAllowDeny              = 'Deny,Allow';
   
-  ouput();
+  //ouput();
+  
+  $('input[type="text"]').keyup(onKeyUpInputText);
 
-  $('input[type="text"]').keyup(function() {
+  /*$('input[type="text"]').keyup(function() { */
   
     /* Input which can be empty */
-    // if IP is empty
+    /*// if IP is empty
     serverIp = validateInput(server_ip, '*', 'ip');
     
     // if PORT is empty
@@ -135,18 +140,51 @@ function outputText()
     serverAlias = returnIfEmpty(server_alias.val(), '*');
     
     // if EMAIL
-    serverAdmin = validateInput(server_admin, null, 'email');
+    serverAdmin = validateInput(server_admin, null, 'email'); */
       
     /* Input which can not be empty */
-    // if SERVER_NAME
+   /* // if SERVER_NAME
     serverName = returnIfEmpty(server_name.val(), 'example.com');
     
     
     // if DOCUMENT_ROOT
     documentRoot = returnIfEmpty(document_root.val(), '/var/www');    
     
+    // Directory
+  var directories = new Array;
+  directories['root'] = new Array();
+  $('.directory').each(function(i){
+    var directory = $(this);
+    if(i == 0)
+    {
+      directories['root'] = new Array();
+      directories['root']['folder']                 = $('#document_root');
+      directories['root']['option_exec_cgi']        = $('#directory_root #option_exec_cgi');
+      directories['root']['option_followsymlinks']  = $('#directory_root #option_followsymlinks');
+      directories['root']['option_includes']        = $('#directory_root #option_includes');
+      directories['root']['option_indexes']         = $('#directory_root #option_indexes');
+      directories['root']['option_multiviews']      = $('#directory_root #option_multiviews');
+      directories['root']['option_allow_override']  = $('#directory_root #option_allow_override');
+      directories['root']['allow_deny']             = $('#directory_root #allow-deny');
+    }
+    else
+    {
+      directories[i] = new Array();
+      directories[i]['folder']                      = $('#directory_' + i + ' #document_root');
+      directories[i]['option_exec_cgi']             = $('#directory_' + i + ' #option_exec_cgi');
+      directories[i]['option_followsymlinks']       = $('#directory_' + i + ' #option_followsymlinks');
+      directories[i]['option_includes']             = $('#directory_' + i + ' #option_includes');
+      directories[i]['option_indexes']              = $('#directory_' + i + ' #option_indexes');
+      directories[i]['option_multiviews']           = $('#directory_' + i + ' #option_multiviews');
+      directories[i]['option_allow_override']       = $('#directory_' + i + ' #option_allow_override');
+      directories[i]['allow_deny']                  = $('#directory_' + i + ' #allow-deny');
+    }
+  });
+    console.log(directories);
     ouput();
   });
+  
+  
   
   $('input[type="checkbox"]').change(function() {
     dirRootOptionCgi             = isCheckedOption(dir_root_option_exec_cgi) + 'ExecCGI';
@@ -162,7 +200,63 @@ function outputText()
   $('select').change(function(){
     dirRootAllowDeny  = dir_root_allow_deny.attr('value');
     ouput();
-  });
+  }); */
+  
+  function onKeyUpInputText()
+  {
+    var inputText       = $(this);
+    // Retrieve ID
+    var inputTextId     = inputText.attr('id');
+    // Retrieve Class
+    var inputTextClass  = inputText.attr('class');
+    
+    if(!isEmpty(inputTextId))
+    {
+      outputData[inputTextId] = inputText.val();
+      
+      /*switch(inputTextId)
+      {
+        case 'server_ip':
+          
+          break;
+        case 'server_port':
+          
+          break;
+        case 'server_name':
+          
+          break;
+        case 'server_alias':
+          
+          break;
+        case 'server_admin':
+          
+          break;
+      }*/
+    }
+    else if(!isEmpty(inputTextClass))
+    {
+      outputData[inputTextId] = inputText.val();
+    }
+  }
+  
+  function print_r(theObj){
+  if(theObj.constructor == Array ||
+     theObj.constructor == Object){
+    document.write("<ul>")
+    for(var p in theObj){
+      if(theObj[p].constructor == Array||
+         theObj[p].constructor == Object){
+document.write("<li>["+p+"] => "+typeof(theObj)+"</li>");
+        document.write("<ul>")
+        print_r(theObj[p]);
+        document.write("</ul>")
+      } else {
+document.write("<li>["+p+"] => "+theObj[p]+"</li>");
+      }
+    }
+    document.write("</ul>")
+  }
+}
   
   function ouput()
   {
@@ -208,6 +302,20 @@ function outputText()
   }
 }
 
+function isEmpty(obj) 
+{
+  if(typeof obj == 'undefined' || obj === null || obj === '')
+    return true;
+    
+  if(typeof obj == 'number' && isNaN(obj))
+    return true;
+    
+  if(obj instanceof Date && isNaN(Number(obj)))
+    return true;
+    
+  return false;
+}
+
 function returnIfEmpty (inputVal, textIfEmpty)
 {
   if( inputVal == '' )
@@ -215,6 +323,7 @@ function returnIfEmpty (inputVal, textIfEmpty)
   else
     return inputVal;
 }
+
 function validateInput (input, textIfEmpty, type)
 {
   var reg;
@@ -233,6 +342,7 @@ function validateInput (input, textIfEmpty, type)
 	    else
 	      return textIfEmpty
 }
+
 function isCheckedOption (input)
 {
   if (input.attr('checked') == 'checked')
