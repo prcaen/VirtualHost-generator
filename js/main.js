@@ -21,25 +21,36 @@ function outputText()
   var serverName   = 'example.com';
   var serverAlias  = '*';
   var serverAdmin  = null;
-  var documentRoot = '/var/www';
+  var documentRoot = '/var/www/';
   
-  outputData['server_ip'] 	 = serverIp;
-  outputData['server_port']  = serverPort;
-  outputData['server_name']  = serverName;
-  outputData['server_alias'] = serverAlias;
-  outputData['server_admin'] = serverAdmin;
+  var dirOptionCgi              = 'ExecCGI';
+  var dirOptionFollowSymLinks   = 'FollowSymLinks';
+  var dirOptionIncludes         = 'Includes';
+  var dirOptionIndexes          = 'Indexes';
+  var dirOptionMultiViews       = 'MultiViews';
+  var dirOptionAllowOverride    = 'All';
   
-  var dirRootOptionCgi              = '-ExecCGI';
-  var dirRootOptionFollowSymLinks   = '+FollowSymLinks';
-  var dirRootOptionIncludes         = '-Includes';
-  var dirRootOptionIndexes          = '-Indexes';
-  var dirRootOptionMultiViews       = '+MultiViews';
-  var dirRootOptionAllowOverride    = 'All';
-  var dirRootAllowDeny              = 'Deny,Allow';
+  outputData['server_ip'] 	  = serverIp;
+  outputData['server_port']   = serverPort;
+  outputData['server_name']   = serverName;
+  outputData['server_alias']  = serverAlias;
+  outputData['server_admin']  = serverAdmin;
+  outputData['document_root'] = documentRoot
+  
+  outputData['directory_root'] = new Array();
+  outputData['directory_root']['option_exec_cgi']        = '-' + dirOptionCgi;
+  outputData['directory_root']['option_followsymlinks']  = '+' + dirOptionFollowSymLinks;
+  outputData['directory_root']['option_includes']        = '-' + dirOptionIncludes;
+  outputData['directory_root']['option_indexes']         = '-' + dirOptionIndexes;
+  outputData['directory_root']['option_multiviews']      = '+' + dirOptionMultiViews;
+  outputData['directory_root']['option_allow_override']  = dirOptionAllowOverride;
+  
+   /* var dirAllowDeny              = 'Deny,Allow'; */  
   
   ouput();
   
   $('input[type="text"]').keyup(onKeyUpInputText);
+  $('input[type="checkbox"]').change(onChangeInputCheckbox);
   
   function onKeyUpInputText()
   {
@@ -56,7 +67,7 @@ function outputText()
    	else
    		inputTextSelector = inputTextClass;
       
-    switch(inputTextId)
+    switch(inputTextSelector)
     {
       case 'server_ip':
         outputData[inputTextSelector] = validateInput(inputText, serverIp, 'ip');
@@ -73,10 +84,58 @@ function outputText()
       case 'server_admin':
         outputData[inputTextSelector] = validateInput(inputText, serverAdmin, 'email');
         break;
+      case 'document_root':
+        outputData[inputTextSelector] = validateInput(inputText, documentRoot, 'folder');
     }
     
     ouput();
 	}
+	
+	function onChangeInputCheckbox()
+	{
+	  var inputCheckbox = $(this);
+	   // Retrieve ID
+    var inputCheckboxId     = inputCheckbox.attr('id');
+    // Retrieve Class
+    var inputCheckboxClass  = inputCheckbox.attr('class');
+    // Selector
+    var inputCheckboxSelector;
+    
+    if(!isEmpty(inputCheckboxId))
+    	inputCheckboxSelector = inputCheckboxId;
+   	else
+   		inputCheckboxSelector = inputCheckboxClass;
+   		
+   		
+    
+    switch(inputCheckboxSelector)
+    {
+      case 'option_exec_cgi':
+        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionCgi;
+        break;
+     case 'option_followsymlinks':
+        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionFollowSymLinks;
+        break;
+     case 'option_includes':
+        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIncludes;
+        break;
+     case 'option_indexes':
+        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIndexes;
+        break;
+     case 'option_multiviews':
+        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionMultiViews;
+        break;
+     case 'option_allow_override':
+        if(inputCheckbox.attr('checked') == 'checked')
+          outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = 'All';
+        else
+          outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = 'None';
+        break;
+    }
+    
+    ouput();
+	}
+
 }
   
 function ouput()
@@ -96,13 +155,13 @@ function ouput()
     output += '\tOrder Deny,Allow \n';
     output += '\t</Directory>\n';
     output += '\n';
-    /* output += '\tDocumentRoot ' + documentRoot + '/\n';
-    output += '\t<Directory ' + documentRoot + '/ >\n';
-    output += '\t\tOptions ' + dirRootOptionCgi + ' ' + dirRootOptionFollowSymLinks;
-    output += ' ' + dirRootOptionIndexes + ' ' + dirRootOptionIncludes + ' '
-    output += dirRootOptionMultiViews + '\n';
-    output += '\t\tAllowOverride ' + dirRootOptionAllowOverride + '\n';
-    output += '\t\tOrder ' + dirRootAllowDeny + '\n';
+    output += '\tDocumentRoot ' + outputData['document_root'] + '\n';
+    output += '\t<Directory ' + outputData['document_root'] + ' >\n';
+    output += '\t\tOptions ' + outputData['directory_root']['option_exec_cgi'] + ' ' + outputData['directory_root']['option_followsymlinks'];
+    output += ' ' + outputData['directory_root']['option_indexes'] + ' ' + outputData['directory_root']['option_includes'] + ' '
+    output += outputData['directory_root']['option_multiviews'] + '\n';
+    output += '\t\tAllowOverride ' + outputData['directory_root']['option_allow_override'] + '\n';
+    /*output += '\t\tOrder ' + dirRootAllowDeny + '\n';
     if(dirRootAllowDeny == 'Deny,Allow')
     {
       output += '\t\tDeny from All \n';
@@ -112,15 +171,14 @@ function ouput()
     else
     {
       output += '\t\tAllow from All \n';
-    }
-    */
+    }*/
     output += '\t</Directory>\n';
     output += '</VirtualHost>';
       
     $('pre').text(output);
     
     // ***** Skin
-    //$('#directory_root legend').first().text('Répertoire racine (' + documentRoot + '/)');
+    $('#directory_root legend').first().text('Répertoire racine (' + outputData['document_root'] + ')');
 }
   
 function isEmpty(obj) 
@@ -219,13 +277,14 @@ function duplicate()
     }
     
     target = 'directory_' + duplicateDirectoryCount;
+    outputData[target] = new Array();
     fieldsetDuplicate.attr('id', target);
     duplicateDirectoryCount++;
     
   }
   
   fieldsetToDuplicate.after(fieldsetDuplicate);
-  
+  outputText();
   var to = fieldsetDuplicate.offset().top;
   scrollElement.animate({ scrollTop: to }, {
     duration: Math.abs($(window).scrollTop() - to) * 0.75,
