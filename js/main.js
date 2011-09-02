@@ -6,6 +6,20 @@ var valid = false;
 var output;
 var outputData = new Array();
 
+var serverIp     = '*';
+var serverPort   = 80;
+var serverName   = 'example.com';
+var serverAlias  = '*';
+var serverAdmin  = null;
+var documentRoot = '/var/www/';
+
+var dirOptionCgi              = 'ExecCGI';
+var dirOptionFollowSymLinks   = 'FollowSymLinks';
+var dirOptionIncludes         = 'Includes';
+var dirOptionIndexes          = 'Indexes';
+var dirOptionMultiViews       = 'MultiViews';
+var dirOptionAllowOverride    = 'All';
+
 $(document).ready(function(){
   outputText();
 
@@ -16,20 +30,6 @@ $(document).ready(function(){
 
 function outputText()
 {  
-  var serverIp     = '*';
-  var serverPort   = 80;
-  var serverName   = 'example.com';
-  var serverAlias  = '*';
-  var serverAdmin  = null;
-  var documentRoot = '/var/www/';
-  
-  var dirOptionCgi              = 'ExecCGI';
-  var dirOptionFollowSymLinks   = 'FollowSymLinks';
-  var dirOptionIncludes         = 'Includes';
-  var dirOptionIndexes          = 'Indexes';
-  var dirOptionMultiViews       = 'MultiViews';
-  var dirOptionAllowOverride    = 'All';
-  
   outputData['server_ip'] 	  = serverIp;
   outputData['server_port']   = serverPort;
   outputData['server_name']   = serverName;
@@ -37,13 +37,14 @@ function outputText()
   outputData['server_admin']  = serverAdmin;
   outputData['document_root'] = documentRoot
   
-  outputData['directory_root'] = new Array();
-  outputData['directory_root']['option_exec_cgi']        = '-' + dirOptionCgi;
-  outputData['directory_root']['option_followsymlinks']  = '+' + dirOptionFollowSymLinks;
-  outputData['directory_root']['option_includes']        = '-' + dirOptionIncludes;
-  outputData['directory_root']['option_indexes']         = '-' + dirOptionIndexes;
-  outputData['directory_root']['option_multiviews']      = '+' + dirOptionMultiViews;
-  outputData['directory_root']['option_allow_override']  = dirOptionAllowOverride;
+  outputData['directory'] = new Array();
+  outputData['directory']['root'] = new Array();
+  outputData['directory']['root']['option_exec_cgi']        = '-' + dirOptionCgi;
+  outputData['directory']['root']['option_followsymlinks']  = '+' + dirOptionFollowSymLinks;
+  outputData['directory']['root']['option_includes']        = '-' + dirOptionIncludes;
+  outputData['directory']['root']['option_indexes']         = '-' + dirOptionIndexes;
+  outputData['directory']['root']['option_multiviews']      = '+' + dirOptionMultiViews;
+  outputData['directory']['root']['option_allow_override']  = dirOptionAllowOverride;
   
    /* var dirAllowDeny              = 'Deny,Allow'; */  
   
@@ -54,18 +55,8 @@ function outputText()
   
   function onKeyUpInputText()
   {
-    var inputText       = $(this);
-    // Retrieve ID
-    var inputTextId     = inputText.attr('id');
-    // Retrieve Class
-    var inputTextClass  = inputText.attr('class');
-    
-    var inputTextSelector;
-    
-    if(!isEmpty(inputTextId))
-    	inputTextSelector = inputTextId;
-   	else
-   		inputTextSelector = inputTextClass;
+    var inputText         = $(this);
+    var inputTextSelector = retrieveInputSelector(inputText)
       
     switch(inputTextSelector)
     {
@@ -93,43 +84,35 @@ function outputText()
 	
 	function onChangeInputCheckbox()
 	{
-	  var inputCheckbox = $(this);
-	   // Retrieve ID
-    var inputCheckboxId     = inputCheckbox.attr('id');
-    // Retrieve Class
-    var inputCheckboxClass  = inputCheckbox.attr('class');
-    // Selector
-    var inputCheckboxSelector;
-    
-    if(!isEmpty(inputCheckboxId))
-    	inputCheckboxSelector = inputCheckboxId;
-   	else
-   		inputCheckboxSelector = inputCheckboxClass;
-   		
-   		
+	  var inputCheckbox         = $(this);
+	  var inputCheckboxSelector = retrieveInputSelector(inputCheckbox)
+	  var idDirectory           = inputCheckbox.parent().parent().attr('id');
+	  
+	  if(idDirectory == 'directory_root')
+	    idDirectory = 'root';
     
     switch(inputCheckboxSelector)
     {
       case 'option_exec_cgi':
-        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionCgi;
+        outputData['directory'][idDirectory][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionCgi;
         break;
      case 'option_followsymlinks':
-        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionFollowSymLinks;
+        outputData['directory'][idDirectory][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionFollowSymLinks;
         break;
      case 'option_includes':
-        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIncludes;
+        outputData['directory'][idDirectory][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIncludes;
         break;
      case 'option_indexes':
-        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIndexes;
+        outputData['directory'][idDirectory][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionIndexes;
         break;
      case 'option_multiviews':
-        outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionMultiViews;
+        outputData['directory'][idDirectory][inputCheckboxSelector] = isCheckedOption(inputCheckbox) + dirOptionMultiViews;
         break;
      case 'option_allow_override':
         if(inputCheckbox.attr('checked') == 'checked')
-          outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = 'All';
+          outputData['directory'][idDirectory][inputCheckboxSelector] = 'All';
         else
-          outputData[inputCheckbox.parent().parent().attr('id')][inputCheckboxSelector] = 'None';
+          outputData['directory'][idDirectory][inputCheckboxSelector] = 'None';
         break;
     }
     
@@ -157,10 +140,10 @@ function ouput()
     output += '\n';
     output += '\tDocumentRoot ' + outputData['document_root'] + '\n';
     output += '\t<Directory ' + outputData['document_root'] + ' >\n';
-    output += '\t\tOptions ' + outputData['directory_root']['option_exec_cgi'] + ' ' + outputData['directory_root']['option_followsymlinks'];
-    output += ' ' + outputData['directory_root']['option_indexes'] + ' ' + outputData['directory_root']['option_includes'] + ' '
-    output += outputData['directory_root']['option_multiviews'] + '\n';
-    output += '\t\tAllowOverride ' + outputData['directory_root']['option_allow_override'] + '\n';
+    output += '\t\tOptions ' + outputData['directory']['root']['option_exec_cgi'] + ' ' + outputData['directory']['root']['option_followsymlinks'];
+    output += ' ' + outputData['directory']['root']['option_indexes'] + ' ' + outputData['directory']['root']['option_includes'] + ' '
+    output += outputData['directory']['root']['option_multiviews'] + '\n';
+    output += '\t\tAllowOverride ' + outputData['directory']['root']['option_allow_override'] + '\n';
     /*output += '\t\tOrder ' + dirRootAllowDeny + '\n';
     if(dirRootAllowDeny == 'Deny,Allow')
     {
@@ -173,26 +156,13 @@ function ouput()
       output += '\t\tAllow from All \n';
     }*/
     output += '\t</Directory>\n';
+    console.log(outputData['directory'].length);
     output += '</VirtualHost>';
       
     $('pre').text(output);
     
     // ***** Skin
     $('#directory_root legend').first().text('Répertoire racine (' + outputData['document_root'] + ')');
-}
-  
-function isEmpty(obj) 
-{
-  if(typeof obj == 'undefined' || obj === null || obj === '')
-    return true;
-    
-  if(typeof obj == 'number' && isNaN(obj))
-    return true;
-    
-  if(obj instanceof Date && isNaN(Number(obj)))
-    return true;
-    
-  return false;
 }
 
 function validateInput(input, textIfEmpty, type)
@@ -277,7 +247,15 @@ function duplicate()
     }
     
     target = 'directory_' + duplicateDirectoryCount;
-    outputData[target] = new Array();
+    
+    outputData['directory'][target] = new Array();
+    outputData['directory'][target]['option_exec_cgi']        = '-' + dirOptionCgi;
+    outputData['directory'][target]['option_followsymlinks']  = '+' + dirOptionFollowSymLinks;
+    outputData['directory'][target]['option_includes']        = '-' + dirOptionIncludes;
+    outputData['directory'][target]['option_indexes']         = '-' + dirOptionIndexes;
+    outputData['directory'][target]['option_multiviews']      = '+' + dirOptionMultiViews;
+    outputData['directory'][target]['option_allow_override']  = dirOptionAllowOverride;
+    
     fieldsetDuplicate.attr('id', target);
     duplicateDirectoryCount++;
     
