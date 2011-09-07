@@ -26,3 +26,20 @@ function retrieveInputSelector(input)
  	else
  		alert('Erreur');
 }
+
+function onLabelClick()
+{
+  var label      = $(this);
+  var input      = label.prev();
+  if(input.is(':checkbox'))
+  {
+    var inputClass = input.attr('class');
+    if(!isEmpty(inputClass))
+    {
+      if(input.attr('checked') == 'checked')
+        input.attr('checked', false);
+      else
+        input.attr('checked', true);
+    }
+  }
+}

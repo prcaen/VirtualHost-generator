@@ -28,6 +28,9 @@ $(document).ready(function(){
   // Link to duplicate
   $('.directory p.duplicate a').click(duplicate);
   $('#phpmyadmin p.duplicate a').click(duplicate);
+  
+  // On click label witch have there a class for input
+  $('label').click(onLabelClick)
 });
 
 function outputText()
