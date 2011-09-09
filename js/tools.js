@@ -19,7 +19,9 @@ function retrieveInputSelector(input)
   // Retrieve Class
   var inputClass  = input.attr('class');
   
-  if(!isEmpty(inputId))
+  if(!isEmpty(inputClass))
+    return inputClass;
+  else if(!isEmpty(inputId))
   	return inputId;
   else if(!isEmpty(inputClass))
     return inputClass;

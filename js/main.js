@@ -44,6 +44,7 @@ function outputText()
   if(isEmpty(outputData.directory.root))
   {
     outputData.directory.root = {};
+    outputData.directory.root.restrict_ip = {};
     outputData.directory.root.document               = documentRoot;
     outputData.directory.root.option_exec_cgi        = '-' + dirOptionCgi;
     outputData.directory.root.option_followsymlinks  = '+' + dirOptionFollowSymLinks;
@@ -88,6 +89,13 @@ function outputText()
       case 'document':
         var idDirectory = inputText.parent().parent().parent().attr('id');
         outputData.directory[idDirectory][inputTextSelector] = validateInput(inputText, documentRoot, 'folder');
+        break;
+      case 'domaine_or_ip':
+        var idDirectory = inputText.parent().parent().parent().parent().attr('id');
+        if(idDirectory == 'directory_root')
+	        idDirectory = 'root';
+        outputData.directory[idDirectory].restrict_ip[inputText.attr('id')] = validateInput(inputText, serverIp, 'ip');
+        console.log(outputData);
         break;
     }
     
@@ -262,6 +270,21 @@ function duplicate()
 
     var $nextP = $linkDuplicate.parent().next();
     target = 'domaine_or_ip_' + duplicateIptoCount;
+    
+    var idDirectory;
+    if($this.parent().parent().parent().attr('id') == 'phpmyadmin')
+      idDirectory = $this.parent().parent().parent().attr('id')
+    else
+      idDirectory = $this.parent().parent().parent().parent().attr('id');
+      
+    if(idDirectory == 'directory_root')
+      idDirectory = 'root';
+    
+    if(isEmpty(outputData.directory[idDirectory]['restrict_ip']))
+      outputData.directory[idDirectory]['restrict_ip'] = {};
+    
+    outputData.directory[idDirectory]['restrict_ip'][target] = $nextP.children('input').val();
+    
     $nextP.children('label').attr('for', target);
     $nextP.children('input').attr('name', target).attr('id', target);
     duplicateIptoCount++;
