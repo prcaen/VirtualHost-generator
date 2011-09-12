@@ -74,7 +74,7 @@
                 <legend>Restriction d'accès par adresse IP ou domaine</legend>
                 <p>
                   <label for="allow-deny">Ordre des restrictions</label>
-                  <select name="allow-deny" id="allow_deny">
+                  <select name="allow-deny" id="directory_allow_deny">
                     <option value="Allow,Deny">Allow,Deny</option>
                     <option value="Deny,Allow" selected="selected">Deny,Allow</option>
                   </select>
@@ -100,8 +100,6 @@
               <p>
                 <label for="log_level">Niveau d'alerte des erreurs : </label>
                 <select name="log_level" id="log_level">
-                debug, info, notice, warn, error, crit,
-	    # alert, emerg.
                   <option value="debug">debug</option>
                   <option value="info">info</option>
                   <option value="notice">notice</option>
@@ -121,7 +119,7 @@
             <fieldset id="phpmyadmin">
               <legend>Protection de phpMyadmin</legend>
               <p>
-                <input type="checkbox" name="protect_phpmyadmin" id="protect_phpmyadmin" /> 
+                <input type="checkbox" name="protect_phpmyadmin" id="protect_phpmyadmin" checked="checked" /> 
                 <label for="protect_phpmyadmin">Protéger phpMyadmin ?</label><br />
                 <em>(pour plus de sécurité, laissez l'option active)</em>
               </p>
@@ -129,7 +127,7 @@
                 <legend>Restriction d'accès par adresse IP ou domaine</legend>
                 <p>
                   <label for="allow-deny">Ordre des restrictions</label>
-                  <select name="allow-deny">
+                  <select name="allow-deny" id="phpmyadmin_allow_deny">
                     <option value="allow-deny">Allow, Deny</option>
                     <option value="deny-allow" selected="selected">Deny, Allow</option>
                   </select>
@@ -140,7 +138,7 @@
                     <a href="#">Dupliquer</a>
                   </p>
                   <p>
-                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip_1" id="domaine_or_ip_1" />
+                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip_1" class ="domaine_or_ip" id="domaine_or_ip_1" />
                   </p>
                 </fieldset>
               </fieldset>

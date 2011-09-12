@@ -22,6 +22,10 @@ var dirOptionMultiViews       = 'MultiViews';
 var dirOptionAllowOverride    = 'All';
 var dirAllowDeny              = 'Deny,Allow';
 
+var logLevel          = 'debug';
+var protectPhpMyAdmin = true;
+var serverSignature   = false;
+
 $(document).ready(function(){
   outputText();
 
@@ -35,11 +39,18 @@ $(document).ready(function(){
 
 function outputText()
 {  
-  (isEmpty(outputData.server_ip))    ? outputData.server_ip    = serverIp : '';
-  (isEmpty(outputData.server_port))  ? outputData.server_port  = serverPort : '';
-  (isEmpty(outputData.server_name))  ? outputData.server_name  = serverName : '';
+  (isEmpty(outputData.server_ip))    ? outputData.server_ip    = serverIp    : '';
+  (isEmpty(outputData.server_port))  ? outputData.server_port  = serverPort  : '';
+  (isEmpty(outputData.server_name))  ? outputData.server_name  = serverName  : '';
   (isEmpty(outputData.server_alias)) ? outputData.server_alias = serverAlias : '';
   (isEmpty(outputData.server_admin)) ? outputData.server_admin = serverAdmin : '';
+  
+  (isEmpty(outputData.log_level))              ? outputData.log_level              = logLevel             : '';
+  (isEmpty(outputData.protect_phpmyadmin))     ? outputData.protect_phpmyadmin     = protectPhpMyAdmin    : '';
+  (isEmpty(outputData.phpmyadmin_allow_deny))  ? outputData.phpmyadmin_allow_deny  = dirAllowDeny         : '';
+  (isEmpty(outputData.phpmyadmin))             ? outputData.phpmyadmin             = {}                   : '';
+  (isEmpty(outputData.phpmyadmin.restrict_ip)) ? outputData.phpmyadmin.restrict_ip = {}                   : '';
+  (isEmpty(outputData.server_signature))       ? outputData.server_signature       = serverSignature      : '';
   
   if(isEmpty(outputData.directory.root))
   {
@@ -52,7 +63,7 @@ function outputText()
     outputData.directory.root.option_indexes         = '-' + dirOptionIndexes;
     outputData.directory.root.option_multiviews      = '+' + dirOptionMultiViews;
     outputData.directory.root.option_allow_override  = dirOptionAllowOverride;
-    outputData.directory.root.allow_deny             = dirAllowDeny;
+    outputData.directory.root.directory_allow_deny   = dirAllowDeny;
   }
   
   outputF();
@@ -93,10 +104,16 @@ function outputText()
       case 'domaine_or_ip':
         var idDirectory = inputText.parent().parent().parent().parent().attr('id');
         if(idDirectory == 'directory_root')
+        {
 	        idDirectory = 'root';
-        outputData.directory[idDirectory].restrict_ip[inputText.attr('id')] = validateInput(inputText, serverIp, 'ip');
-        console.log(outputData);
+          outputData.directory[idDirectory].restrict_ip[inputText.attr('id')] = validateInput(inputText, null, 'ip');
+        }
+        else
+          outputData.phpmyadmin.restrict_ip[inputText.attr('id')] = validateInput(inputText, null, 'ip');
         break;
+      case 'file_error':
+      case 'file_custom_error':
+        outputData[inputTextSelector] = validateInput(inputText, null, 'folder');
     }
     
     outputF();
@@ -134,8 +151,19 @@ function outputText()
         else
           outputData.directory[idDirectory][inputCheckboxSelector] = 'None';
         break;
+     case 'protect_phpmyadmin':
+        if(inputCheckbox.attr('checked') == 'checked')
+          outputData.protect_phpmyadmin = true;
+        else
+          outputData.protect_phpmyadmin = false;
+        break;
+     case 'server_signature':
+        if(inputCheckbox.attr('checked') == 'checked')
+          outputData.server_signature = true;
+        else
+          outputData.server_signature = false;
     }
-    
+
     outputF();
 	}
 	
@@ -143,14 +171,20 @@ function outputText()
 	{
 	  var select = $(this);
 	  var selectSelector = retrieveInputSelector(select);
-	  
+
 	  switch(selectSelector)
 	  {
-	    case 'allow_deny':
+	    case 'directory_allow_deny':
 	      var idDirectory = select.parent().parent().parent().attr('id');
 	      if(idDirectory == 'directory_root')
 	        idDirectory = 'root';
 	      outputData.directory[idDirectory][selectSelector] = select.val();
+	      break;
+	    case 'log_level':
+	      outputData[selectSelector] = select.val();
+	      break;
+	    case 'phpmyadmin_allow_deny':
+	      outputData.phpmyadmin_allow_deny = select.val();
 	      break;
 	  }
 	  
@@ -162,13 +196,12 @@ function outputText()
 function outputF()
 {
   // ******* OUTPUT ********
-    
     output  = 'NameVirtualHost ' + outputData.server_ip + ':' + outputData.server_port + '\n';
     output += '\n';
     output += '<VirtualHost ' + outputData.server_ip + ':' + outputData.server_port + '>\n';
     output += '\tServerName  ' + outputData.server_name + '\n';
     output += '\tServerAlias ' + outputData.server_alias + '.' + outputData.server_name + '\n';
-    if(outputData.server_admin != null)
+    if(outputData.server_admin)
       output += '\tServerAdmin ' + outputData.server_admin + '\n';
     output += '\n';
     output += '\t<Directory / >\n';
@@ -176,6 +209,8 @@ function outputF()
     output += '\t\tOrder Deny,Allow \n';
     output += '\t</Directory>\n';
     output += '\n';
+    
+    // Directory
     output += '\tDocumentRoot ' + outputData.directory.root.document + '\n';
     for(var key in outputData.directory)
     {
@@ -184,20 +219,79 @@ function outputF()
       output += ' ' + outputData.directory[key].option_indexes + ' ' + outputData.directory[key].option_includes + ' '
       output += outputData.directory[key].option_multiviews + '\n';
       output += '\t\tAllowOverride ' + outputData.directory[key].option_allow_override + '\n';
-      output += '\t\tOrder ' + outputData.directory[key].allow_deny + '\n';
-      if(outputData.directory[key].allow_deny == 'Deny,Allow')
+      output += '\t\tOrder ' + outputData.directory[key].directory_allow_deny + '\n';
+      if(outputData.directory[key].directory_allow_deny == 'Deny,Allow')
       {
         output += '\t\tDeny from All \n';
-        output += '\t\tAllow from localhost\t# Local \n';
-        output += '\t\tAllow from 127.0.0.1\t# Local \n';
+        output += '\t\tAllow from localhost\t\t# Local \n';
+        output += '\t\tAllow from 127.0.0.1\t\t# Local \n';
+        for(var value in outputData.directory[key].restrict_ip)
+        {
+          if(outputData.directory[key].restrict_ip[value])
+            output += '\t\tAllow from ' + outputData.directory[key].restrict_ip[value] + '\n';
+        }
       }
       else
       {
         output += '\t\tAllow from All \n';
+        for(var value in outputData.directory[key].restrict_ip)
+        {
+          if(outputData.directory[key].restrict_ip[value])
+            output += '\t\tDeny from ' + outputData.directory[key].restrict_ip[value] + '\n';
+        }
       }
       output += '\t</Directory>\n';
       output += '\n';
     }
+    
+    // Logs
+    output += '\t# Logs\n';
+    
+    if(outputData.file_error)
+      output += '\tErrorLog ' + outputData.file_error + '\n';
+      
+    output += '\tLogLevel ' + outputData.log_level + '\n';
+    
+    if(outputData.file_error)
+      output += '\CustomLog ' + outputData.file_custom_error + '\n';
+
+    // PhpMyAdmin
+    if(outputData.protect_phpmyadmin)
+    {
+      output += '\n';
+      output += '\t# PHPMyAdmin\n';
+      output += '\t<Directory /usr/share/phpmyadmin>\n';
+      if(outputData.phpmyadmin_allow_deny == 'Deny,Allow')
+      {
+        output += '\t\tDeny from All \n';
+        output += '\t\tAllow from localhost\t\t# Local \n';
+        output += '\t\tAllow from 127.0.0.1\t\t# Local \n';
+        for(var value in outputData.phpmyadmin.restrict_ip)
+        {
+          if(outputData.phpmyadmin.restrict_ip[value])
+            output += '\t\tAllow from ' + outputData.phpmyadmin.restrict_ip[value] + '\n';
+        }
+      }
+      else
+      {
+        output += '\t\tAllow from All \n';
+        for(var value in outputData.phpmyadmin.restrict_ip)
+        {
+          if(outputData.phpmyadmin.restrict_ip[value])
+            output += '\t\tDeny from ' + outputData.phpmyadmin.restrict_ip[value] + '\n';
+        }
+      }
+      output += '\t</Directory>\n';
+    }
+    
+    // Security
+    if(outputData.server_signature == false)
+    {
+      output += '\n';
+      output += '\t# Security\n';
+      output += '\tServerSignature Off\n';
+    }
+    
     output += '</VirtualHost>';
       
     $('pre').text(output);
@@ -280,10 +374,15 @@ function duplicate()
     if(idDirectory == 'directory_root')
       idDirectory = 'root';
     
-    if(isEmpty(outputData.directory[idDirectory]['restrict_ip']))
-      outputData.directory[idDirectory]['restrict_ip'] = {};
-    
-    outputData.directory[idDirectory]['restrict_ip'][target] = $nextP.children('input').val();
+    if(!isEmpty(outputData.directory[idDirectory]))
+    {
+      if(isEmpty(outputData.directory[idDirectory]['restrict_ip']))
+        outputData.directory[idDirectory]['restrict_ip'] = {};
+      
+      outputData.directory[idDirectory]['restrict_ip'][target] = $nextP.children('input').val();
+    }
+    else
+      outputData.phpmyadmin.restrict_ip[target] = $nextP.children('input').val();
     
     $nextP.children('label').attr('for', target);
     $nextP.children('input').attr('name', target).attr('id', target);
@@ -311,7 +410,7 @@ function duplicate()
     outputData.directory[target]['option_includes']        = isCheckedOption(fieldsetDuplicate.find('.option_includes')) + dirOptionIncludes;
     outputData.directory[target]['option_indexes']         = isCheckedOption(fieldsetDuplicate.find('.option_indexes')) + dirOptionIndexes;
     outputData.directory[target]['option_multiviews']      = isCheckedOption(fieldsetDuplicate.find('.option_multiviews')) + dirOptionMultiViews;
-    outputData.directory[target]['allow_deny']             = fieldsetDuplicate.find('#allow_deny').val();
+    outputData.directory[target]['directory_allow_deny']   = fieldsetDuplicate.find('#directory_allow_deny').val();
     
     if(fieldsetDuplicate.find('.option_allow_override').attr('checked') == 'checked')
       outputData.directory[target]['option_allow_override']  = 'All';
