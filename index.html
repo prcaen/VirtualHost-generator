@@ -1,166 +1,416 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Apache 2 : Générateur de fichier VirtualHost</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-    <script type="text/javascript" src="js/tools.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
-    <link type="text/css" rel="stylesheet" href="css/main.css" media="screen" />
-  </head>
-  <body>
-    <div id="main">
-      <h1>Générateur de fichier VirtualHost</h1>
-      <p>Grâce à ce générateur vous pouvez créer rapidement votre fichier <strong>VirtualHost</strong> pour <strong>Apache2</strong>.</p>
-      <form action="" method="post">
-        <fieldset id="contenaire">     
-          <fieldset id="vh-options">
-            <p>
-              <label for="server_ip">Adresse IP du serveur</label> <input type="text" name="server_ip" id="server_ip" />
-            </p>
-            <p>
-              <label for="server_port">Port du serveur</label> <input type="text" name="server_port" id="server_port" />
-            </p>
-            <p>
-              <label for="server_name">Nom du domaine <em>(example.com)</em> <span class="important">*</span> </label><input type="text" name="server_name" id="server_name" />
-            </p>
-            <p>
-              <label for="server_alias">Nom de l'Alias <em>(blog.example.com)</em></label> <input type="text" name="server_alias" id="server_alias" /><br />
-              <em>Laissez vide si vous souhaitez que tout les sous-domaines pointent vers ce VirtualHost.</em>
-            </p>
-            <p>
-              <label for="server_admin">Courriel de l'administrateur</label> <input type="text" name="server_admin" id="server_admin" />
-            </p>
-            <p>
-              <label for="document_root">Répertoire racine <span class="important">*</span></label> <input type="text" name="document_root" id="document_root" value="/var/www/" /><br />
-            </p>
-            <fieldset class="directory" id="directory_root">
-              <legend>Répertoire racine (/var/www/)</legend>
-              <p class="duplicate">
-                    <a href="#">Dupliquer</a>
-              </p>
-              <p>
-                <input type="checkbox" name="option_exec_cgi" class="option_exec_cgi" /> 
-                <label for="option_exec_cgi">Autoriser l'éxécution des scripts CGI</label><br />
-                <em>L'exécution des scripts CGI est autorisée sur le serveur (pour plus de sécurité, laissez l'option inactive).</em>
-              </p>
-              <p>
-                <input type="checkbox" name="option_followsymlinks" class="option_followsymlinks" checked="checked" /> 
-                <label for="option_followsymlinks">Autoriser le serveur à suivre les liens symboliques</label><br />
-                <em>Permet d'afficher de lister le contenu d'un répertoire. Nécessaire pour l'URL Rewriting</em>
-              </p>
-              <p>
-                <input type="checkbox" name="option_includes" class="option_includes" /> 
-                <label for="option_includes">Inclusion Server-Side permises</label><br />
-                <em>Les inclusions par Server-Side-Include sont permises (pour plus de sécurité, laissez l'option inactive).</em>
-              </p> 
-              <p>
-                <input type="checkbox" name="option_indexes" class="option_indexes" /> 
-                <label for="option_indexes">Indexation des fichiers</label><br />
-                <em>Permet d'afficher de lister le contenu d'un répertoire (pour plus de sécurité, laissez l'option inactive)</em>
-              </p>   
-              <p>
-                <input type="checkbox" name="option_multiviews" class="option_multiviews" checked="checked" /> 
-                <label for="option_multiviews">MultiViews</label><br />
-                <em>Nécessaire pour l'URL Rewriting.</em>
-              </p>
-              <p>
-                <input type="checkbox" name="option_allow_override" class="option_allow_override" checked="checked" /> 
-                <label for="option_allow_override">Permettre l'utilisation du fichier ".htaccess"</label>
-              </p>
-              
-              <fieldset>
-                <legend>Restriction d'accès par adresse IP ou domaine</legend>
-                <p>
-                  <label for="allow-deny">Ordre des restrictions</label>
-                  <select name="allow-deny" id="directory_allow_deny">
-                    <option value="Allow,Deny">Allow,Deny</option>
-                    <option value="Deny,Allow" selected="selected">Deny,Allow</option>
-                  </select>
-                </p>
-                <fieldset class="restrict-ip">
-                  <legend>Autoriser :</legend>
-                  <p class="duplicate">
-                    <a href="#">Dupliquer</a>
-                  </p>
-                  <p>
-                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip" class="domaine_or_ip" id="domaine_or_ip_1" />
-                  </p>
-                </fieldset>
-              </fieldset>      
-            </fieldset>
-            
-            <fieldset>
-              <legend>Logs des erreurs</legend>
-              <p>
-                <label for="file_error">Chemin vers le fichier d'erreurs : </label> <input type="text" name="file_error" id="file_error" /><br />
-                <em>Laissez vide si vous souhaitez utiliser celui par défaut.</em>
-              </p>
-              <p>
-                <label for="log_level">Niveau d'alerte des erreurs : </label>
-                <select name="log_level" id="log_level">
-                  <option value="debug">debug</option>
-                  <option value="info">info</option>
-                  <option value="notice">notice</option>
-                  <option value="warn">warn</option>
-                  <option value="error">error</option>
-                  <option value="crit">crit</option>
-                  <option value="alert">alert</option>
-                  <option value="emerg">emerg</option>
-                </select>
-              </p>
-              <p>
-                <label for="file_custom_error">Chemin vers le fichier d'erreurs custom ? : </label> <input type="text" name="file_custom_error" id="file_custom_error" /><br />
-                <em>Laissez vide si vous souhaitez utiliser celui par défaut.</em>
-              </p>
-            </fieldset>
-            
-            <fieldset id="phpmyadmin">
-              <legend>Protection de phpMyadmin</legend>
-              <p>
-                <input type="checkbox" name="protect_phpmyadmin" id="protect_phpmyadmin" checked="checked" /> 
-                <label for="protect_phpmyadmin">Protéger phpMyadmin ?</label><br />
-                <em>(pour plus de sécurité, laissez l'option active)</em>
-              </p>
-              <fieldset>
-                <legend>Restriction d'accès par adresse IP ou domaine</legend>
-                <p>
-                  <label for="allow-deny">Ordre des restrictions</label>
-                  <select name="allow-deny" id="phpmyadmin_allow_deny">
-                    <option value="allow-deny">Allow, Deny</option>
-                    <option value="deny-allow" selected="selected">Deny, Allow</option>
-                  </select>
-                </p>
-                <fieldset class="restrict-ip">
-                  <legend>Autoriser :</legend>
-                  <p class="duplicate">
-                    <a href="#">Dupliquer</a>
-                  </p>
-                  <p>
-                    <label for="domaine_or_ip_1">Adresse IP ou domaine : </label><input type="text" name="domaine_or_ip_1" class ="domaine_or_ip" id="domaine_or_ip_1" />
-                  </p>
-                </fieldset>
-              </fieldset>
-            </fieldset>
-            
-            <fieldset>
-              <legend>Options avancées</legend>
-              <p>
-                <input type="checkbox" name="server_signature" id="server_signature" /> 
-                <label for="server_signature">Permettre au serveur d'envoyé la version d'Apache, la version de PHP et le système d'eploitation</label><br />
-                <em>(pour plus de sécurité, laissez l'option inactive)</em>
-              </p>
-            </fieldset>
-            </fieldset>
-            <fieldset id="vh-generate">
-              <legend>Votre VirtualHost généré</legend>
-              <p>
-                <pre></pre>
-              </p>
-            </fieldset>
-        </fieldset>      
-      </form>
-    </div>
-  </body>
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>		<html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>		<html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>VirtualHost Generator - generating Apache2 server virtualhost</title>
+	<meta name="description" content="A virtualhost generator for Apache2 server">
+	<meta name="author" content="Pierrick CAEN">
+
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+	<link rel="stylesheet" href="css/style.css">
+
+	<script src="js/libs/modernizr-2.5.3.min.js"></script>
+</head>
+<body>
+<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+<div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</a>
+			<a class="brand" href="#">VirtualHost Generator</a>
+			<div class="nav-collapse">
+				<ul class="nav">
+					<li><a data-toggle="modal" href="#about">About</a></li>
+					<li><a href="mailto:prcaen@gmail.com">Contact</a></li>
+					<li><a data-toggle="modal" href="#changelog">Changelog</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="hero-unit">
+		<h1>Your VirtualHost</h1>
+		<p>With this script you can easily create your Apache2 VirtualHost. In few seconds. So let's start.</p>
+		<pre class="output"></pre>
+	</div>
+	<section>
+		<div class="page-header">
+			<a class="btn btn-small pull-right toggle-all" href="#">Reset to defaults</a>
+			<h2>1. VirtualHost general settings</h2>
+		</div>
+		<div class="row">
+			<div class="span4">
+				<label>Server IP / Server domain</label>
+				<input type="text" class="span3 vh-input-text" data-type="ip-domain" name="server_ip" id="server_ip" placeholder="74.125.230.224"> <sup>*</sup>
+				<label>Server port</label>
+				<input type="text" class="span3 vh-input-text" data-type="port" name="server_port" id="server_port" placeholder="80">
+			</div>
+			<div class="span4">
+				<label>Server name</label>
+				<input type="text" class="span3 vh-input-text" data-type="domain" name="server_name" id="server_name" placeholder="google.com"> <sup>*</sup>
+				<label>Server alias</label>
+				<input type="text" class="span3 vh-input-text" data-type="domain_alias" name="server_alias" id="server_alias" placeholder="*.google.com">
+				<p class="help-block">Please let this blank for all alias</p>
+			</div>
+			<div class="span4">
+				<label>Email admin</label>
+				<input type="email" class="span3 vh-input-text" data-type="email" name="server_admin" id="server_admin" placeholder="nyan@cat.com">
+				<label>Root folder</label>
+				<input type="text" class="span3 vh-input-text" data-type="folder-name" name="document_root" id="document_root" placeholder="/var/www/"> <sup>*</sup>
+				<div class="control-group">
+					<div class="controls">
+						<label class="checkbox"><input type="checkbox" name="server_signature" id="server_signature" class="vh-input-checkbox">Display server signature</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="folder_root" class="folder">
+		<div class="page-header">
+			<a class="btn btn-small btn-success pull-right new-folder" href="#">New folder</a>
+			<h2>2. Root folder</h2>
+		</div>
+		<div class="row">
+			<div class="span4">
+				<div class="control-group">
+					<h3>Folder options</h3>
+					<div class="controls">
+						<label class="checkbox">
+							<input type="checkbox" name="option_exec_cgi" id="optionExecCGI" class="options_folder">
+							Allow CGI scripts
+						</label>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_followsymlinks" id="optionFollowSymlinks" class="options_folder">
+							Allow server to follow symbolic links
+						</label>
+						<label class="checkbox">
+							<input type="checkbox" name="option_includes" name="option_includes" id="optionIncludes" class="options_folder">
+							Allow server-side includes
+						</label>
+						<label class="checkbox">
+							<input type="checkbox" name="option_indexes" id="optionIndexes" class="options_folder">
+							Allow indexes files
+						</label>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_multiviews" id="optionMultiviews" class="options_folder">
+							Allow multiviews
+						</label>
+						<p class="help-block"><strong>Note:</strong> Usefull for URL rewriting</p>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_allow_override" id="optionAllowOverride" class="options_folder"> Allow .htaccess file
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="span4">
+				<div class="control-group">
+					<h3>IP / domain restriction</h3>
+					<div class="controls">
+						<label>Order restriction</label>
+						<select id="folder_order_restrict_root" class="span2 order-restrict">
+							<option value="Allow,Deny">Allow,Deny</option>
+							<option value="Deny,Allow">Deny,Allow</option>
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="hide" id="empty_allow">
+						<p class="allowed">
+							<label>Allow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<p class="disallowed" style="display: none">
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-success new-ip-restrict">New allowed IP/domain</button>
+					</div>
+					<div class="hide" id="empty_disallow">
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+					<div>
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_1" id="domaine_or_ip_1" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="folder hide" id="new_folder">
+		<div class="page-header">
+			<a class="btn btn-small btn-success pull-right new-folder" href="#">New folder</a>
+			<h2>2. Other folder</h2>
+		</div>
+		<div class="row">
+			<a class="btn btn-mini btn-danger pull-right delete-folder" href="#">Delete folder</a>
+			<div class="span4">
+				<div class="control-group">
+					<h3>Folder name</h3> 
+					<input type="text" class="span3 folder_name" data-type="folder-name" name="folder_name" placeholder="/var/www/"> <sup>*</sup>
+					<h3>Folder options</h3>
+					<div class="controls">
+						<label class="checkbox">
+							<input type="checkbox" name="option_exec_cgi" id="optionExecCGI" class="options_folder">
+							Allow CGI scripts
+						</label>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_followsymlinks" id="optionFollowSymlinks" class="options_folder">
+							Allow server to follow symbolic links
+						</label>
+						<label class="checkbox">
+							<input type="checkbox" name="option_includes" name="option_includes" id="optionIncludes" class="options_folder">
+							Allow server-side includes
+						</label>
+						<label class="checkbox">
+							<input type="checkbox" name="option_indexes" id="optionIndexes" class="options_folder">
+							Allow indexes files
+						</label>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_multiviews" id="optionMultiviews" class="options_folder">
+							Allow multiviews
+						</label>
+						<p class="help-block"><strong>Note:</strong> Usefull for URL rewriting</p>
+						<label class="checkbox">
+							<input checked="checked" type="checkbox" name="option_allow_override" id="optionAllowOverride" class="options_folder"> Allow .htaccess file
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="span4">
+				<div class="control-group">
+					<h3>IP / domain restriction</h3>
+					<div class="controls">
+						<label>Order restriction</label>
+						<select id="root_folder_order_restrict" class="span2 order-restrict">
+							<option value="Allow,Deny">Allow,Deny</option>
+							<option value="Deny,Allow">Deny,Allow</option>
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="hide" id="empty_allow">
+						<p>
+							<label>Allow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-success new-ip-restrict">New allowed IP/domain</button>
+					</div>
+					<div class="hide" id="empty_disallow">
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+					<div>
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-restrict-ip" data-type="ip-domain" name="domaine_or_ip_1" id="domaine_or_ip_1" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div class="page-header">
+			<h2>3. Errors logs</h2>
+		</div>
+		<div class="row">
+			<div class="span4">
+				<div class="control-group">
+					<label>Error file</label>
+					<input type="text" name="file_error" data-type="folder-file-name" class="vh-input-text" id="errorLog" placeholder="/var/log/apache2/error_log" />
+					<p class="help-block"><strong>Note:</strong> let's it blank for default value</p>
+				</div>
+			</div>
+			<div class="span4">
+				<div class="control-group">
+					<label>Log level</label>
+					<select name="log_level" id="log_level" class="vh-select">
+						<option value="debug">debug</option>
+						<option value="info">info</option>
+						<option value="notice">notice</option>
+						<option value="warn">warn</option>
+						<option value="error">error</option>
+						<option value="crit">crit</option>
+						<option value="alert">alert</option>
+						<option value="emerg">emerg</option>
+					</select>
+				</div>
+			</div>
+			<div class="span4">
+				<div class="control-group">
+					<label>Custom error file</label>
+					<input type="text" name="file_custom_error" class="vh-input-text" data-type="folder-file-name" id="accessLog" placeholder="/var/log/apache2/access_log" />
+					<p class="help-block"><strong>Note:</strong> let's it blank for default value</p>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div class="page-header">
+			<h2>4. PHPMyAdmin protect</h2>
+		</div>
+		<div class="row">
+			<div class="span12">
+				<label class="checkbox"><input checked="checked" type="checkbox" name="phpmyadmin_protect" id="phpmyadmin_protect" class="vh-input-checkbox"> Protect phpMyAdmin ?</label>
+			</div>
+			<div class="span4">
+				<div class="control-group">
+					<h3>IP / domain restriction</h3>
+					<div class="controls">
+						<label>Order restriction</label>
+						<select id="phpmyadmin_allow_deny" class="span2 order-restrict">
+							<option value="Allow,Deny" selected="selected">Allow,Deny</option>
+							<option value="Deny,Allow">Deny,Allow</option>
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="hide" id="empty_allow">
+						<p>
+							<label>Allow</label>
+							<input type="text" class="span2 vh-phpmyadmin-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-success new-ip-restrict">New allowed IP/domain</button>
+					</div>
+					<div class="hide" id="empty_disallow">
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-phpmyadmin-restrict-ip" data-type="ip-domain" name="domaine_or_ip_new" id="domaine_or_ip_new" placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+					<div>
+						<p>
+							<label>Disallow</label>
+							<input type="text" class="span2 vh-phpmyadmin-restrict-ip" data-type="ip-domain" name="domaine_or_ip_1" id="domaine_or_ip_1"placeholder="74.125.230.224">
+						</p>
+						<button class="btn btn-mini btn-danger new-ip-restrict">New disallowed IP/domain</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="download_section">
+		<div class="page-header">
+			<h2>5. Download</h2>
+		</div>
+		<a id="vh-download" class="btn btn-primary">Download your VirtualHost</a>
+	</section>
+	<hr>
+	<footer>
+		<p>&copy; Pierrick CAEN 2012</p>
+		<div class="bs-links">
+			<ul class="quick-links">
+				<li class="html5_logo">
+					<a href="http://www.w3.org/html/logo/">
+						<img src="http://www.w3.org/html/logo/badge/html5-badge-h-css3-semantics.png" width="52" height="20" alt="HTML5 Powered with CSS3 / Styling, and Semantics" title="HTML5 Powered with CSS3 / Styling, and Semantics">
+					</a>
+				</li>
+				<li>
+					<iframe class="github-btn" src="http://markdotto.github.com/github-buttons/github-btn.html?user=prcaen&amp;repo=VirtualHost-generator&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="85" height="20"></iframe>
+				</li>
+				<li>
+					<iframe class="github-btn" src="http://markdotto.github.com/github-buttons/github-btn.html?user=prcaen&amp;repo=VirtualHost-generator&amp;type=fork&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="85" height="20"></iframe>
+				</li>
+				<li class="follow-btn">
+					<a href="https://twitter.com/nimbus147" class="twitter-follow-button" data-show-count="false">Follow @nimbus147</a>
+				</li>
+				<li>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-text="Use the Apache2 VirtualHost generator - an usefull tools" data-via="nimbus147" data-hashtags="VirtualHost,Apache2">Tweet</a>
+				</li>
+			</ul>
+		</div>
+	</footer>
+	<div class="modal hide fade" id="about">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>About this project</h3>
+		</div>
+		<div class="modal-body">
+			<p>This project was created to help server administrator when they have to create an apache2 virtual host.</p>
+			<p>All options are set by default for a production server.</p>
+			<p>This project is open source and you can fork it on <a href="https://github.com/prcaen/VirtualHost-generator">github</a>.</p>
+			<p>This use the Twitter's bootstrap, modernizr plugin and jQuery</p>
+			<p>BlobBuilder is use on this project to download your VirtualHost.</p>
+			<h4>About the author</h4>
+			<p><img src="http://lh5.googleusercontent.com/-60XpkLFjWMg/AAAAAAAAAAI/AAAAAAAAABc/DoR6EIfyK5U/s48-c-k/photo.jpg" width="30px" height="30px" alt="Pierrick CAEN Google+ profil picture"> Pierrick CAEN is a web student at <a href="//www.hetic.net">Hetic</a> school.</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Close</a>
+		</div>
+	</div>
+	<div class="modal hide fade" id="changelog">
+		<div class="modal-header">
+			<a class="close" data-dismiss="modal">×</a>
+			<h3>Changelog</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+				<span class="label"><date datetime="2012-03-03">2012-03-03</date> - v0.2</span>
+				<ul>
+					<li>Use Twitter bootstrap</li>
+					<li>Refactoring JS code to a jQuery plugin</li>
+					<li>Use BlobBuilder to download the VirtualHost.</li>
+				</ul>
+			</p>
+			<p>
+				<span class="label"><date datetime="2011-09-12">2011-09-12</date> - v0.1</span>
+				<ul>
+					<li>HTML without CSS format</li>
+					<li>JS ONLY</li>
+				</ul>
+			</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn" data-dismiss="modal">Close</a>
+		</div>
+	</div>
+</div><!-- /container -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+
+<script src="js/libs/bootstrap/transition.js"></script>
+<script src="js/libs/bootstrap/collapse.js"></script>
+<script src="js/libs/bootstrap/modal.js"></script>
+<script src="js/libs/jquery.virtualhostgenerator.js"></script>
+
+<script src="js/plugins.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/script.js"></script>
+<script>
+	// Google Analytics
+	var _gaq=[['_setAccount','UA–24545456–3'],['_trackPageview']];
+	(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+	g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+	s.parentNode.insertBefore(g,s)}(document,'script'));
+	// Twitter
+	!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+</script>
+<script></script>
+</body>
 </html>

@@ -1,47 +1,22 @@
-function isEmpty(obj) 
-{
-  if(typeof obj == 'undefined' || obj === null || obj === '')
-    return true;
-    
-  if(typeof obj == 'number' && isNaN(obj))
-    return true;
-    
-  if(obj instanceof Date && isNaN(Number(obj)))
-    return true;
-    
-  return false;
+function isEmail(email) {
+	var reg = new RegExp('^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$', 'i');
+
+	if(reg.test(email) && !isEmpty(email))
+		return true;
+	else
+		return false;
 }
 
-function retrieveInputSelector(input)
+function isEmpty(obj)
 {
- // Retrieve ID
-  var inputId     = input.attr('id');
-  // Retrieve Class
-  var inputClass  = input.attr('class');
-  
-  if(!isEmpty(inputClass))
-    return inputClass;
-  else if(!isEmpty(inputId))
-  	return inputId;
-  else if(!isEmpty(inputClass))
-    return inputClass;
- 	else
- 		alert('Erreur');
-}
+	if(typeof obj == 'undefined' || obj === null || obj === '')
+		return true;
 
-function onLabelClick()
-{
-  var label      = $(this);
-  var input      = label.prev();
-  if(input.is(':checkbox'))
-  {
-    var inputClass = input.attr('class');
-    if(!isEmpty(inputClass))
-    {
-      if(input.attr('checked') == 'checked')
-        input.attr('checked', false);
-      else
-        input.attr('checked', true);
-    }
-  }
+	if(typeof obj == 'number' && isNaN(obj))
+		return true;
+
+	if(obj instanceof Date && isNaN(Number(obj)))
+		return true;
+
+	return false;
 }

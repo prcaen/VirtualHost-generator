@@ -1,0 +1,36 @@
+/* ===== Primary Styles ========================================================
+   Author: Pierrick CAEN
+   ========================================================================== */
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+sup {
+	color: #D53312
+}
+
+.quick-links {
+	min-height: 30px;
+	margin: 0;
+	padding: 5px 20px;
+	list-style: none;
+	text-align: center;
+	overflow: hidden;
+}
+
+.quick-links li {
+	display: inline;
+	margin: 0 5px;
+	color: #999;
+}
+
+.html5_logo {
+	position: relative;
+	top: -5px;
+}
+
+#vh-download {
+	width: 100%; font-size: 30px; padding: 19px 0; margin-bottom: 50px
+}
+
+
